@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Soil Buddy RE</title><meta name="theme-color" content="#4d6b14"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+:root{--hero:#4d6b14;--leaf:#7a9a1e;--water:#2b8fd1;--paper:#f4f2e4;--card:#fffdf5;--ink:#1f2a12;--mut:#6b7557;--bad:#c0392b;--ok:#2e7d32;--warn:#b7791f;color-scheme:light}
+@media(prefers-color-scheme:dark){:root{--paper:#141a0c;--card:#1d2613;--ink:#eef2dc;--mut:#a3ad8c;color-scheme:dark}}
+*{box-sizing:border-box}body{margin:0 auto;max-width:430px;min-height:100vh;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;touch-action:manipulation;background:var(--paper);color:var(--ink);font:16px/1.4 system-ui,sans-serif;padding-bottom:96px}
+.hero{background:var(--hero);color:#fff;padding:calc(18px + env(safe-area-inset-top,0px)) 18px 70px;border-radius:0 0 34px 34px}
+.hero h1{margin:0;font-size:26px}.hero small{opacity:.8}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{display:inline-flex;gap:6px;align-items:center;padding:6px 12px;border-radius:99px;background:rgba(255,255,255,.18);font-size:14px;margin-top:10px}
+button{font:inherit;border:0;border-radius:14px;padding:12px 16px;background:var(--leaf);color:#fff;font-weight:600;cursor:pointer}
+button.alt{background:var(--card);color:var(--ink);border:1px solid var(--mut)}button.w{background:var(--water)}button.r{background:var(--bad)}
+.tab{display:none;padding:0 14px}.tab.on{display:block}
+.card{background:var(--card);border-radius:22px;padding:16px;margin:-44px 0 14px;box-shadow:0 6px 18px #0002}.card+.card{margin-top:0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat b{display:block;font-size:22px}.stat span{color:var(--mut);font-size:13px}
+.ring{position:relative;width:160px;height:160px;margin:auto}.ring svg{transform:rotate(-90deg)}.ring div{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ring b{font-size:34px}.pill{display:inline-block;padding:4px 10px;border-radius:99px;font-size:13px;font-weight:700;background:#0001}
+.bucket{width:110px;height:150px;border:4px solid var(--water);border-radius:6px 6px 22px 22px;margin:auto;position:relative;overflow:hidden}
+.bucket i{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(var(--water),#1b6aa5);transition:height .6s}
+nav{position:fixed;left:50%;transform:translateX(-50%);width:min(calc(100% - 24px),406px);bottom:calc(10px + env(safe-area-inset-bottom,0px));background:#1b2210;border-radius:30px;display:flex;justify-content:space-around;padding:8px 6px}
+nav button{background:none;color:#cfd8b5;padding:8px;font-size:12px;display:grid;justify-items:center}nav button.on{color:#fff}
+nav button.mid{background:var(--water);color:#fff;border-radius:50%;width:60px;height:60px;margin-top:-26px;box-shadow:0 4px 12px #0006}
+pre{background:#10160a;color:#d7f0a8;border-radius:14px;padding:10px;height:300px;overflow:auto;font-size:12px;white-space:pre-wrap}
+input{font:inherit;padding:10px;border-radius:12px;border:1px solid var(--mut);background:var(--card);color:var(--ink);width:100%}
+img#cam{width:100%;border-radius:16px;background:#000;min-height:160px}.note{color:var(--mut);font-size:13px}
+@media(min-width:700px){body{box-shadow:0 0 40px #0003}}[hidden]{display:none!important}</style></head><body>
+<div class="hero"><div class="row" style="justify-content:space-between"><div><small id="date"></small><h1>Hello, plant parent 🌶️</h1><small>Sili · garden soil · 500 mL tank</small></div><span style="font-size:34px">🌱</span></div>
+<div class="row"><span class="chip" id="link">⚪ Not connected</span></div>
+<div class="row" style="margin-top:12px"><button id="bt">🔵 Connect Bluetooth</button><button class="alt" id="demo">Use the demo device</button><button class="alt" id="inst" hidden>📲 Install app</button></div></div>
+
+<section class="tab on" id="home"><div class="card"><div class="ring"><svg width="160" height="160"><circle cx="80" cy="80" r="66" fill="none" stroke="#0001" stroke-width="14"/><circle id="arc" cx="80" cy="80" r="66" fill="none" stroke="#7a9a1e" stroke-width="14" stroke-linecap="round" stroke-dasharray="415" stroke-dashoffset="415"/></svg><div><b id="soil">--</b><span class="note">soil index</span></div></div>
+<p class="note" style="text-align:center">Relative ADC index, not calibrated soil moisture. <span id="mood"></span></p>
+<svg id="spark" viewBox="0 0 300 50" width="100%" height="50"></svg></div>
+<div class="card" style="margin-top:0"><div class="grid"><div class="stat"><b id="ml">--</b><span>tank estimate (mL)</span></div><div class="stat"><b id="pump">--</b><span>pump</span></div><div class="stat"><b id="mode">--</b><span>mode</span></div><div class="stat"><b id="guard">--</b><span>water guard</span></div></div>
+<p class="note" id="age"></p></div></section>
+
+<section class="tab" id="cams"><div class="card"><img id="cam" alt="camera"><p class="row"><input id="ip" placeholder="ESP32-CAM IP e.g. 192.168.4.1"><button id="camgo">Watch</button></p><p class="note">Visual observation only. If the browser blocks it, open the camera page directly: <a id="camlink" target="_blank">stream</a></p></div></section>
+
+<section class="tab" id="water"><div class="card"><div class="bucket"><i id="fill" style="height:0"></i></div><p style="text-align:center"><b id="ml2">--</b> mL <span class="note">(estimate)</span></p>
+<div class="grid"><button class="w" data-c="pump test" data-confirm="1">🧪 Pump test 30 s</button><button data-c="pump auto">🤖 Auto</button><button class="r" data-c="pump off">🛑 Stop / Off</button><button class="alt" data-c="threshold">📋 Rules</button></div>
+<p class="note">Auto starts OFF. Pilot rule from the sketch: 1 s pulse, 90 s soak, 2 pulses, 5 min break. Pump test skips the water guard, so stay beside it.</p></div></section>
+
+<section class="tab" id="term"><div class="card"><pre id="log"></pre><div class="row" style="margin:8px 0"><input id="cmd" placeholder="help, status, soil, water…" style="flex:1"><button id="go">Send</button></div>
+<div class="row"><button class="alt" data-c="help">help</button><button class="alt" data-c="status">status</button><button class="alt" data-c="soil">soil</button><button class="alt" data-c="water">water</button><label class="note"><input type="checkbox" id="hex" style="width:auto"> hex</label></div></div></section>
+
+<section class="tab" id="setup"><div class="card"><h3 style="margin-top:0">Dabble link</h3>
+<p class="note">Dabble frame (assumed): FF, version, module, function, 1 arg, length, text, 00. Change if the board ignores commands. Module is learned from the board's first reply.</p>
+<div class="grid"><label>Version<input id="cv" value="01"></label><label>Module<input id="cm" value="01"></label><label>Function<input id="cf" value="01"></label><label>Extra BLE service UUID<input id="cu" placeholder="optional"></label></div>
+<p><button class="alt" id="all">List all Bluetooth devices</button></p>
+<p class="note">Made for Android Chrome: open the page, tap Install app (or menu, Add to Home screen). No iPhone. Percent and mL are uncalibrated estimates. Demo rows are labelled DEMO.</p></div></section>
+
+<nav><button data-t="home" class="on">🏠<span>Home</span></button><button data-t="cams">📷<span>Camera</span></button><button data-t="water" class="mid">💧</button><button data-t="term">⌨️<span>Terminal</span></button><button data-t="setup">⚙️<span>Setup</span></button></nav>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const NUS='6e400001-b5a3-f393-e0a9-e50e24dcca9e',S={soil:null,ml:null,pump:'--',mode:'--',guard:'--',at:0,demo:false},H=[];
+let rx=null,tx=null,dev=null,poll=null,buf=[],txt='',tm=null;
+$('#date').textContent=new Date().toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'short'});
+$$('nav button').forEach(b=>b.onclick=()=>{$$('nav button,.tab').forEach(e=>e.classList.remove('on'));b.classList.add('on');$('#'+b.dataset.t).classList.add('on')});
+const hx=id=>parseInt($(id).value,16)||0;
+function log(s){const l=$('#log');l.textContent+=s+'\n';l.scrollTop=l.scrollHeight}
+// ---- Dabble frame: FF ver module fn argc len data 00
+function enc(t){const d=[...new TextEncoder().encode(t)];return Uint8Array.from([0xFF,hx('#cv'),hx('#cm'),hx('#cf'),1,d.length,...d,0])}
+function feed(u8){if($('#hex').checked)log('RX '+[...u8].map(b=>b.toString(16).padStart(2,'0')).join(' '));buf.push(...u8);
+ for(;;){const s=buf.indexOf(0xFF);
+  if(s<0){if(buf.length&&buf.every(b=>b>=9&&b<127)){text(new TextDecoder().decode(Uint8Array.from(buf)));buf=[]}return}
+  if(s>0)buf.splice(0,s);if(buf.length<6)return;
+  const n=buf[4];if(buf.length<5+n)return;const L=buf.slice(5,5+n);const tot=5+n+L.reduce((a,b)=>a+b,0)+1;if(buf.length<tot)return;
+  if(buf[tot-1]!==0){buf.shift();continue}
+  let p=5+n,out='';for(const l of L){out+=new TextDecoder().decode(Uint8Array.from(buf.slice(p,p+l)));p+=l}
+  if(!$('#cm').dataset.l){$('#cm').value=buf[2].toString(16).padStart(2,'0');$('#cm').dataset.l=1}
+  buf.splice(0,tot);text(out)}}
+function text(t){txt+=t;let i;while((i=txt.indexOf('\n'))>=0){line(txt.slice(0,i).replace(/\r/g,''));txt=txt.slice(i+1)}}
+function line(l){if(!l.trim())return;log((S.demo?'[DEMO] ':'')+l);parse(l);draw()}
+function parse(l){let m;S.at=Date.now();
+ if(m=l.match(/Soil:\s*([\d.]+)%/))S.soil=+m[1];else if(m=l.match(/\(([\d.]+)% relative index\)/))S.soil=+m[1];
+ if(m=l.match(/Water:\s*~?(\d+) mL/)||l.match(/Estimated water:\s*(\d+) mL/))S.ml=+m[1];
+ if(m=l.match(/Pump mode:\s*(.+)/))S.mode=m[1].trim();
+ if(m=l.match(/Pump state:\s*(\w+)/))S.pump=m[1];
+ if(m=l.match(/Water guard:\s*(\w+)/))S.guard=m[1];
+ if(/PUMP OFF/.test(l))S.pump='OFF';if(/PUMP TEST STARTED|AUTO watering started/i.test(l))S.pump='ON';
+ if(S.soil!=null){H.push(S.soil);if(H.length>60)H.shift()}}
+function draw(){const s=S.soil;$('#soil').textContent=s==null?'--':s.toFixed(0)+'%';$('#arc').style.strokeDashoffset=415*(1-(s||0)/100);
+ $('#mood').textContent=s==null?'':s<=0?'🥺 Relatively dry':s>=50?'😊 Relatively wet':'🙂 Middle';
+ $('#ml').textContent=$('#ml2').textContent=S.ml==null?'--':S.ml;$('#fill').style.height=Math.min(100,(S.ml||0)/5)+'%';
+ $('#pump').textContent=S.pump==='ON'?'🚿 ON':S.pump==='OFF'?'🛑 OFF':'--';$('#mode').textContent=S.mode;
+ $('#guard').textContent=S.guard==='PASS'?'✅ Pass':S.guard==='--'?'--':'🚨 '+(S.guard==='LOW'?'Low':S.guard);
+ $('#age').textContent=S.at?(S.demo?'DEMO data · ':'')+'updated '+new Date(S.at).toLocaleTimeString():'';
+ const pts=H.map((v,i)=>`${i*300/Math.max(H.length-1,1)},${48-v*.46}`).join(' ');$('#spark').innerHTML=H.length>1?`<polyline points="${pts}" fill="none" stroke="#7a9a1e" stroke-width="3"/>`:''}
+// ---- send
+async function send(c){c=c.trim();if(!c)return;log('> '+c);
+ if(S.demo)return demoCmd(c);if(!rx)return log('Not connected.');
+ const d=enc(c);try{for(let i=0;i<d.length;i+=20){const p=d.slice(i,i+20);rx.properties.writeWithoutResponse?await rx.writeValueWithoutResponse(p):await rx.writeValue(p)}}catch(e){log('Send failed: '+e.message)}}
+$$('[data-c]').forEach(b=>b.onclick=()=>{if(b.dataset.confirm&&!confirm('Pump test runs 30 s and ignores the water guard. Tank filled, pump submerged, and you are beside it?'))return;send(b.dataset.c)});
+$('#go').onclick=()=>{send($('#cmd').value);$('#cmd').value=''};$('#cmd').onkeydown=e=>e.key==='Enter'&&$('#go').click();
+// ---- Bluetooth
+function setLink(t){$('#link').textContent=t}
+async function connect(all){if(!navigator.bluetooth)return alert('Web Bluetooth needs Chrome or Edge (not iPhone/Safari).');
+ stopDemo();const extra=$('#cu').value.trim().toLowerCase(),svc=[0xFFE0,NUS,...(extra?[extra]:[])];
+ try{dev=await navigator.bluetooth.requestDevice(all?{acceptAllDevices:true,optionalServices:svc}:{filters:[{name:'Soil Buddy RE'}],optionalServices:svc});
+  setLink('🟡 Connecting…');dev.ongattserverdisconnected=()=>{clearInterval(poll);rx=tx=null;setLink('🔴 Disconnected')};
+  const g=await dev.gatt.connect();rx=tx=null;
+  for(const s of await g.getPrimaryServices()){if(/^0000180[01]/.test(s.uuid))continue;
+   for(const c of await s.getCharacteristics()){const p=c.properties;if(!tx&&(p.notify||p.indicate))tx=c;if(!rx&&(p.write||p.writeWithoutResponse))rx=c}if(tx&&rx)break}
+  if(!tx||!rx)throw Error('No usable Bluetooth characteristics. Add the board service UUID in Setup.');
+  tx.addEventListener('characteristicvaluechanged',e=>{const v=e.target.value;feed(new Uint8Array(v.buffer,v.byteOffset,v.byteLength))});
+  await tx.startNotifications();setLink('🟢 '+(dev.name||'Connected'));log('Connected via '+rx.service.uuid);
+  send('status');poll=setInterval(()=>send('status'),5000)}
+ catch(e){setLink('🔴 '+(e.name==='NotFoundError'?'No device chosen':e.message));log(e.message)}}
+$('#bt').onclick=()=>connect(false);$('#all').onclick=()=>connect(true);
+// ---- Demo device (same text the sketch prints, through the same parser)
+const D={soil:62,ml:400,pump:'OFF',mode:'OFF / STANDBY'};
+function demoTick(){D.soil=Math.max(0,Math.min(100,D.soil+(D.pump==='ON'?9:-1.2)+(Math.random()-.5)));D.ml=Math.max(0,D.ml-(D.pump==='ON'?20:0));
+ text(`🌱 Soil: ${D.soil.toFixed(1)}% relative index (ADC ${Math.round((100-D.soil)*40.95)})\n🪣 Water: ~${Math.round(D.ml)} mL / 500 mL (ADC 2000)\n🎛️ Pump mode: ${D.mode}\n🚿 Pump state: ${D.pump}\n🛡️ Water guard: ${D.ml>60?'PASS':'LOW'}\n`)}
+function demoCmd(c){if(c==='pump test'){D.pump='ON';D.mode='TIMED TEST';text('🧪🚿 SUPERVISED 30-SECOND PUMP TEST STARTED!\n');clearTimeout(tm);tm=setTimeout(()=>{D.pump='OFF';D.mode='OFF / STANDBY';text('🛑🚿 PUMP OFF — test ended.\n')},8000)}
+ else if(c==='pump off'){D.pump='OFF';D.mode='OFF / STANDBY';text('🛑🚿 PUMP OFF — user stop.\n')}else if(c==='pump auto'){D.mode='AUTO';text('🤖🌱 AUTO mode enabled!\n')}
+ else if(c==='status')demoTick();else text('Demo device: try status, pump test, pump auto, pump off.\n')}
+function stopDemo(){clearInterval(poll);S.demo=false}
+$('#demo').onclick=()=>{stopDemo();S.demo=true;setLink('🧪 DEMO device');log('Demo started.');demoTick();poll=setInterval(demoTick,2000)};
+// ---- Camera (fetch + MJPEG parse; plain <img> is blocked from HTTPS pages)
+const ix=(b,a)=>{for(let i=0;i<b.length-1;i++)if(b[i]===a[0]&&b[i+1]===a[1])return i;return-1};
+$('#camgo').onclick=async()=>{const ip=$('#ip').value.trim();if(!ip)return;$('#camlink').href=`http://${ip}:81/stream`;
+ try{const r=await fetch(`http://${ip}:81/stream`),rd=r.body.getReader();let b=new Uint8Array(0),old;
+  for(;;){const{value,done}=await rd.read();if(done)break;const n=new Uint8Array(b.length+value.length);n.set(b);n.set(value,b.length);b=n;
+   let s=ix(b,[255,216]),e=ix(b,[255,217]);while(s>=0&&e>s){const u=URL.createObjectURL(new Blob([b.slice(s,e+2)],{type:'image/jpeg'}));$('#cam').src=u;if(old)URL.revokeObjectURL(old);old=u;b=b.slice(e+2);s=ix(b,[255,216]);e=ix(b,[255,217])}}}
+ catch(e){alert('Camera blocked or unreachable: '+e.message+'\nTry the stream link, or open this app from http://localhost.')}};
+let ev;addEventListener('beforeinstallprompt',e=>{e.preventDefault();ev=e;$('#inst').hidden=false});
+$('#inst').onclick=()=>{ev&&ev.prompt();ev=null;$('#inst').hidden=true};addEventListener('appinstalled',()=>{$('#inst').hidden=true});
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script></body></html>
