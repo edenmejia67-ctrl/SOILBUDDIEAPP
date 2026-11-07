@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Soil Buddy RE</title><meta name="theme-color" content="#0b1208"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+:root{--bg:#0b1208;--card:#16210e;--c2:#223316;--lime:#b7f33c;--ink:#f1f6e6;--mut:#8fa079;--water:#3fb6ff;--navy:#0e1f4a;--bad:#ff6b5b;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0 auto;max-width:430px;min-height:100vh;background:radial-gradient(500px 300px at 90% -5%,#2b4a12,transparent),var(--bg);color:var(--ink);font:16px/1.4 system-ui,sans-serif;padding:0 14px 110px;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;touch-action:manipulation;overflow-x:hidden}
+.top{padding:calc(16px + env(safe-area-inset-top,0px)) 0 8px;position:relative}.top h1{margin:0;font-size:28px}small,.note{color:var(--mut);font-size:13px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.sp{justify-content:space-between}[hidden]{display:none!important}
+button{font:inherit;border:0;border-radius:16px;padding:12px 16px;background:var(--lime);color:#10200a;font-weight:700;cursor:pointer;transition:transform .1s}button:active{transform:scale(.93)}
+button.alt{background:var(--c2);color:var(--ink)}button.w{background:var(--water);color:#04243a}button.r{background:var(--bad);color:#2b0904}
+.chip{padding:6px 12px;border-radius:99px;background:var(--c2);font-size:14px}
+.tab{display:none}.tab.on{display:block;animation:in .35s}@keyframes in{from{opacity:0;transform:translateY(14px)}}
+.card{background:var(--card);border-radius:26px;padding:16px;margin:12px 0}.lime{background:var(--lime);color:#10200a}
+.ms{display:flex;gap:10px;align-items:flex-end}.ms>div:first-child{flex:1}.mas{width:130px;display:block;margin:auto}
+.bubble{background:#fff;border-radius:16px 16px 16px 4px;padding:8px 10px;font-weight:700;font-size:14px;animation:fl 3s ease-in-out infinite;margin-bottom:6px}
+.bars{display:flex;gap:10px}.bar{text-align:center;font-size:12px;font-weight:700}.bar div{position:relative;height:170px;width:62px;border-radius:24px;background:#0e1f4a2e;overflow:hidden;margin-bottom:4px}
+.bar i{position:absolute;bottom:0;left:0;right:0;height:0;background:var(--navy);transition:height 1s cubic-bezier(.3,1.5,.5,1)}.bar em{position:absolute;bottom:8px;left:0;right:0;font-style:normal;color:#fff;font-size:15px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0}.chp{flex:none;background:var(--c2);border-radius:22px;padding:8px 14px;text-align:center}.chp b{display:block;font-size:20px}.chp.on{background:var(--lime);color:#10200a}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tile{background:var(--card);border-radius:22px;padding:14px}.tile span{font-size:26px;display:inline-block;animation:fl 3.5s ease-in-out infinite}.tile b{display:block;font-size:20px}
+.stk{position:absolute;font-size:30px;animation:fl 4s ease-in-out infinite}@keyframes fl{50%{transform:translateY(-10px) rotate(8deg)}}
+.sway{transform-origin:0 -10px;animation:sw 3s ease-in-out infinite}@keyframes sw{50%{transform:rotate(6deg)}}.eye{transform-box:fill-box;transform-origin:center;animation:bl 4s infinite}@keyframes bl{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+.bucket{width:130px;height:170px;border:4px solid var(--water);border-radius:8px 8px 28px 28px;margin:10px auto;position:relative;overflow:hidden}
+.bucket i{position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(var(--water),#1b6aa5);transition:height .8s}.bucket i:before{content:"";position:absolute;top:-8px;left:-20px;width:200%;height:16px;background:radial-gradient(circle at 10px 16px,transparent 8px,var(--water) 9px) 0 0/20px 16px;animation:wv 1.5s linear infinite}@keyframes wv{to{transform:translateX(20px)}}
+.drop{position:absolute;top:-10px;font-size:20px;opacity:0}.pumping .drop{animation:dr 1s linear infinite}@keyframes dr{0%{opacity:1;top:-10px}100%{opacity:0;top:120px}}
+.vf{position:relative}.vf:before,.vf:after{content:"";position:absolute;width:28px;height:28px;border:3px solid var(--lime);z-index:2}.vf:before{top:10px;left:10px;border-right:0;border-bottom:0}.vf:after{bottom:10px;right:10px;border-left:0;border-top:0}
+img#cam{width:100%;border-radius:20px;background:#000;min-height:180px;display:block}.live{position:absolute;top:14px;right:14px;background:var(--bad);border-radius:99px;padding:2px 10px;font-size:12px;font-weight:800;z-index:3;animation:ch 1.2s infinite}
+pre{background:#070c05;color:#c9f27a;border-radius:16px;padding:10px;height:300px;overflow:auto;font-size:12px;white-space:pre-wrap}
+input{font:inherit;padding:10px;border-radius:14px;border:1px solid #3a4f27;background:var(--c2);color:var(--ink);width:100%}a{color:var(--lime)}
+nav{position:fixed;left:50%;transform:translateX(-50%);width:min(calc(100% - 24px),406px);bottom:calc(10px + env(safe-area-inset-bottom,0px));background:#16210e;border:1px solid #2f4620;border-radius:32px;display:flex;justify-content:space-around;padding:8px 6px;z-index:5;box-shadow:0 10px 30px #000a}
+nav button{background:none;color:var(--mut);padding:8px;font-size:12px;display:grid;justify-items:center}nav button.on{color:var(--lime)}nav button.mid{background:var(--lime);color:#10200a;border-radius:50%;width:62px;height:62px;margin-top:-28px;font-size:24px;box-shadow:0 0 22px #b7f33c88}
+#intro{position:fixed;inset:0;z-index:50;background:#ffd98a;transition:transform .7s cubic-bezier(.7,0,.3,1),opacity .7s}#intro.out{transform:translateY(-100%);opacity:0;pointer-events:none}
+.ib{position:absolute;left:0;right:0;bottom:0;padding:70px 22px calc(26px + env(safe-area-inset-bottom,0px));background:linear-gradient(transparent,#0b1208 60%);max-width:430px;margin:auto}.ib h2{font-size:34px;line-height:1.1;margin:0 0 6px}.ib h2 b{color:var(--lime)}.ib button{width:100%;font-size:18px;margin-top:14px;padding:16px}.ib i{font-style:normal;letter-spacing:2px;animation:ch 1s infinite}@keyframes ch{50%{opacity:.3}}
+.sun{animation:pu 3s ease-in-out infinite;transform-origin:290px 190px}@keyframes pu{50%{transform:scale(1.12)}}.cl{animation:dx 18s linear infinite alternate}@keyframes dx{to{transform:translateX(120px)}}.rw{stroke-dasharray:16 12;animation:mv 1s linear infinite}@keyframes mv{to{stroke-dashoffset:-28}}
+@media(min-width:700px){body{box-shadow:0 0 40px #000}}@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style></head><body>
+<div id="intro"><svg viewBox="0 0 400 600" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%"><defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff8a3d"/><stop offset=".6" stop-color="#ffd98a"/></linearGradient></defs><rect width="400" height="600" fill="url(#sk)"/><circle class="sun" cx="290" cy="190" r="48" fill="#fff3b0"/><g class="cl" fill="#fff" opacity=".85"><ellipse cx="60" cy="120" rx="46" ry="14"/><ellipse cx="90" cy="106" rx="28" ry="14"/></g><path d="M0 330Q120 270 240 320T400 300V600H0Z" fill="#5fae3a"/><path d="M0 385Q150 335 400 375V600H0Z" fill="#3f8f2e"/><path class="rw" d="M200 390L-80 600M200 390L40 600M200 390L150 600M200 390L250 600M200 390L360 600M200 390L480 600" stroke="#1f5f1a" stroke-width="7" stroke-linecap="round" fill="none"/><image href="intro.jpg" width="400" height="600" preserveAspectRatio="xMidYMid slice"/></svg>
+<span class="stk" style="left:10%;top:20%">🌶️</span><span class="stk" style="right:12%;top:34%;animation-delay:-1s">💧</span><span class="stk" style="left:24%;top:46%;animation-delay:-2s">🌱</span>
+<div class="ib"><h2>Smart care for your <b>sili</b> 🌶️</h2><p style="margin:0;color:#cfe0b8">Soil, water and camera in one pocket-size app.</p><button id="start">Get Started <i>›››</i></button></div></div>
+<header class="top"><span class="stk" style="right:64px;top:18px">🌶️</span><span class="stk" style="right:12px;top:48px;animation-delay:-2s">🌱</span>
+<small id="date"></small><h1>Hello, plant parent</h1><div class="row" style="margin:10px 0"><span class="chip" id="link">⚪ Not connected</span><button class="alt" id="mute" style="padding:6px 12px">🔊</button></div>
+<div class="row"><button id="bt">🔵 Connect</button><button class="alt" id="demo">🧪 Demo device</button><button class="alt" id="inst" hidden>📲 Install</button></div></header>
+
+<section class="tab on" id="home"><div class="card lime"><div class="row sp"><b>Soil Health Index</b><span style="background:#fff;border-radius:50%;width:34px;height:34px;display:grid;place-items:center">↗</span></div><small style="color:#10200a99"><span id="mood"></span> <span id="age"></span></small>
+<div class="ms"><div><div class="bubble" id="say">Hi! Connect me 🌱</div><svg class="mas" viewBox="-60 -100 120 160"><g class="sway"><path d="M0 -10C-2 -45 4 -60 0 -75" stroke="#2e7d32" stroke-width="5" fill="none"/><ellipse cx="-20" cy="-60" rx="18" ry="8" fill="#43a047" transform="rotate(-25 -20 -60)"/><ellipse cx="20" cy="-70" rx="18" ry="8" fill="#2e7d32" transform="rotate(25 20 -70)"/><path d="M4 -40q22 6 14 34q-10 -6 -14 -34z" fill="#e53935"/></g><path d="M-38 -10H38L30 50H-30Z" fill="#c8793a"/><rect x="-42" y="-16" width="84" height="12" rx="6" fill="#d98b4a"/><circle class="eye" cx="-12" cy="14" r="4" fill="#2b1608"/><circle class="eye" cx="12" cy="14" r="4" fill="#2b1608"/><path id="mouth" d="M-10 30H10" stroke="#2b1608" stroke-width="3" fill="none" stroke-linecap="round"/></svg></div>
+<div class="bars"><div class="bar"><div><i id="b1"></i><em id="soil">--</em></div>Soil</div><div class="bar"><div><i id="b2"></i><em id="tank">--</em></div>Tank</div></div></div></div>
+<div class="chips" id="chips"></div>
+<div class="grid" style="margin-top:12px"><div class="tile"><span>🚿</span><b id="pump">--</b><small>Pump</small></div><div class="tile"><span>🤖</span><b id="mode">--</b><small>Mode</small></div><div class="tile"><span>🛡️</span><b id="guard">--</b><small>Water guard</small></div><div class="tile"><span>🪣</span><b id="ml">--</b><small>Tank mL (estimate)</small></div></div>
+<div class="card"><small>Soil trend</small><svg id="spark" viewBox="0 0 300 50" width="100%" height="50"></svg><p class="note">Soil % is a relative ADC index and mL is an estimate. Neither is calibrated.</p></div></section>
+
+<section class="tab" id="cams"><div class="card"><div class="vf"><span class="live">LIVE</span><img id="cam" alt="camera"></div><div class="row" style="margin-top:10px"><input id="ip" placeholder="ESP32-CAM IP, e.g. 192.168.4.1" style="flex:1"><button id="camgo">Watch</button></div><p class="note">Visual observation only. If blocked, open <a id="camlink" target="_blank">the stream</a>.</p></div></section>
+
+<section class="tab" id="water"><div class="card" style="position:relative;text-align:center"><div class="bucket"><i id="fill"></i><span class="drop" style="left:30%">💧</span><span class="drop" style="left:55%;animation-delay:-.4s">💧</span><span class="drop" style="left:75%;animation-delay:-.7s">💧</span></div><b style="font-size:26px" id="ml2">--</b> mL <small>(estimate)</small>
+<div class="grid" style="margin-top:12px"><button class="w" data-c="pump test" data-confirm="1">🧪 Pump test 30 s</button><button data-c="pump auto">🤖 Auto</button><button class="r" data-c="pump off">🛑 Stop</button><button class="alt" data-c="threshold">📋 Rules</button></div>
+<p class="note">Auto starts OFF. Pilot rule: 1 s pulse, 90 s soak, 2 pulses, 5 min break. Pump test skips the water guard, so stay beside it.</p></div></section>
+
+<section class="tab" id="term"><div class="card"><pre id="log"></pre><div class="row" style="margin:8px 0"><input id="cmd" placeholder="help, status, soil, water…" style="flex:1"><button id="go">Send</button></div><div class="row"><button class="alt" data-c="help">help</button><button class="alt" data-c="status">status</button><button class="alt" data-c="soil">soil</button><button class="alt" data-c="water">water</button><label class="note"><input type="checkbox" id="hex" style="width:auto"> hex</label></div></div></section>
+
+<section class="tab" id="setup"><div class="card"><h3 style="margin-top:0">Dabble link</h3><p class="note">Frame (assumed): FF, version, module, function, 1 arg, length, text, 00. Edit if the board ignores commands. Module is learned from the board's first reply.</p>
+<div class="grid"><label>Version<input id="cv" value="01"></label><label>Module<input id="cm" value="01"></label><label>Function<input id="cf" value="01"></label><label>Extra BLE service UUID<input id="cu" placeholder="optional"></label></div>
+<p><button class="alt" id="all">List all Bluetooth devices</button></p><p class="note">Made for Android Chrome: tap Install or menu, Add to Home screen. No iPhone. Drop a photo named intro.jpg next to index.html to replace the drawn intro scene. Demo rows are labelled DEMO.</p></div></section>
+
+<nav><button data-t="home" class="on">🏠<span>Home</span></button><button data-t="cams">📷<span>Camera</span></button><button data-t="water" class="mid">💧</button><button data-t="term">⌨️<span>Terminal</span></button><button data-t="setup">⚙️<span>Setup</span></button></nav>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const NUS='6e400001-b5a3-f393-e0a9-e50e24dcca9e',S={soil:null,ml:null,pump:'--',mode:'--',guard:'--',at:0,demo:false},H=[];
+let rx=null,tx=null,dev=null,poll=null,buf=[],txt='',tm=null;
+$('#date').textContent=new Date().toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'short'});
+$$('nav button').forEach(b=>b.onclick=()=>{$$('nav button,.tab').forEach(e=>e.classList.remove('on'));b.classList.add('on');$('#'+b.dataset.t).classList.add('on')});
+const hx=id=>parseInt($(id).value,16)||0;
+function log(s){const l=$('#log');l.textContent+=s+'\n';l.scrollTop=l.scrollHeight}
+// ---- Dabble frame: FF ver module fn argc len data 00
+function enc(t){const d=[...new TextEncoder().encode(t)];return Uint8Array.from([0xFF,hx('#cv'),hx('#cm'),hx('#cf'),1,d.length,...d,0])}
+function feed(u8){if($('#hex').checked)log('RX '+[...u8].map(b=>b.toString(16).padStart(2,'0')).join(' '));buf.push(...u8);
+ for(;;){const s=buf.indexOf(0xFF);
+  if(s<0){if(buf.length&&buf.every(b=>b>=9&&b<127)){text(new TextDecoder().decode(Uint8Array.from(buf)));buf=[]}return}
+  if(s>0)buf.splice(0,s);if(buf.length<6)return;
+  const n=buf[4];if(buf.length<5+n)return;const L=buf.slice(5,5+n);const tot=5+n+L.reduce((a,b)=>a+b,0)+1;if(buf.length<tot)return;
+  if(buf[tot-1]!==0){buf.shift();continue}
+  let p=5+n,out='';for(const l of L){out+=new TextDecoder().decode(Uint8Array.from(buf.slice(p,p+l)));p+=l}
+  if(!$('#cm').dataset.l){$('#cm').value=buf[2].toString(16).padStart(2,'0');$('#cm').dataset.l=1}
+  buf.splice(0,tot);text(out)}}
+function text(t){txt+=t;let i;while((i=txt.indexOf('\n'))>=0){line(txt.slice(0,i).replace(/\r/g,''));txt=txt.slice(i+1)}}
+function line(l){if(!l.trim())return;log((S.demo?'[DEMO] ':'')+l);parse(l);draw()}
+function parse(l){let m;S.at=Date.now();
+ if(m=l.match(/Soil:\s*([\d.]+)%/))S.soil=+m[1];else if(m=l.match(/\(([\d.]+)% relative index\)/))S.soil=+m[1];
+ if(m=l.match(/Water:\s*~?(\d+) mL/)||l.match(/Estimated water:\s*(\d+) mL/))S.ml=+m[1];
+ if(m=l.match(/Pump mode:\s*(.+)/))S.mode=m[1].trim();
+ if(m=l.match(/Pump state:\s*(\w+)/))S.pump=m[1];
+ if(m=l.match(/Water guard:\s*(\w+)/))S.guard=m[1];
+ if(/PUMP OFF/.test(l))S.pump='OFF';if(/PUMP TEST STARTED|AUTO watering started/i.test(l))S.pump='ON';
+ if(S.soil!=null){H.push(S.soil);if(H.length>60)H.shift()}}
+function draw(){fx();const s=S.soil;$('#soil').textContent=s==null?'--':s.toFixed(0)+'%';
+ $('#mood').textContent=s==null?'':s<=0?'🥺 Relatively dry':s>=50?'😊 Relatively wet':'🙂 Middle';
+ $('#ml').textContent=$('#ml2').textContent=S.ml==null?'--':S.ml;$('#fill').style.height=Math.min(100,(S.ml||0)/5)+'%';
+ $('#pump').textContent=S.pump==='ON'?'🚿 ON':S.pump==='OFF'?'🛑 OFF':'--';$('#mode').textContent=S.mode;
+ $('#guard').textContent=S.guard==='PASS'?'✅ Pass':S.guard==='--'?'--':'🚨 '+(S.guard==='LOW'?'Low':S.guard);
+ $('#age').textContent=S.at?(S.demo?'DEMO data · ':'')+'updated '+new Date(S.at).toLocaleTimeString():'';
+ const pts=H.map((v,i)=>`${i*300/Math.max(H.length-1,1)},${48-v*.46}`).join(' ');$('#spark').innerHTML=H.length>1?`<polyline points="${pts}" fill="none" stroke="#b7f33c" stroke-width="3"/>`:''}
+// ---- send
+async function send(c){c=c.trim();if(!c)return;log('> '+c);
+ if(S.demo)return demoCmd(c);if(!rx)return log('Not connected.');
+ const d=enc(c);try{for(let i=0;i<d.length;i+=20){const p=d.slice(i,i+20);rx.properties.writeWithoutResponse?await rx.writeValueWithoutResponse(p):await rx.writeValue(p)}}catch(e){log('Send failed: '+e.message)}}
+$$('[data-c]').forEach(b=>b.onclick=()=>{if(b.dataset.confirm&&!confirm('Pump test runs 30 s and ignores the water guard. Tank filled, pump submerged, and you are beside it?'))return;send(b.dataset.c)});
+$('#go').onclick=()=>{send($('#cmd').value);$('#cmd').value=''};$('#cmd').onkeydown=e=>e.key==='Enter'&&$('#go').click();
+// ---- Bluetooth
+function setLink(t){$('#link').textContent=t}
+async function connect(all){if(!navigator.bluetooth)return alert('Web Bluetooth needs Chrome or Edge (not iPhone/Safari).');
+ stopDemo();const extra=$('#cu').value.trim().toLowerCase(),svc=[0xFFE0,NUS,...(extra?[extra]:[])];
+ try{dev=await navigator.bluetooth.requestDevice(all?{acceptAllDevices:true,optionalServices:svc}:{filters:[{name:'Soil Buddy RE'}],optionalServices:svc});
+  setLink('🟡 Connecting…');dev.ongattserverdisconnected=()=>{clearInterval(poll);rx=tx=null;setLink('🔴 Disconnected')};
+  const g=await dev.gatt.connect();rx=tx=null;
+  for(const s of await g.getPrimaryServices()){if(/^0000180[01]/.test(s.uuid))continue;
+   for(const c of await s.getCharacteristics()){const p=c.properties;if(!tx&&(p.notify||p.indicate))tx=c;if(!rx&&(p.write||p.writeWithoutResponse))rx=c}if(tx&&rx)break}
+  if(!tx||!rx)throw Error('No usable Bluetooth characteristics. Add the board service UUID in Setup.');
+  tx.addEventListener('characteristicvaluechanged',e=>{const v=e.target.value;feed(new Uint8Array(v.buffer,v.byteOffset,v.byteLength))});
+  await tx.startNotifications();setLink('🟢 '+(dev.name||'Connected'));log('Connected via '+rx.service.uuid);sfx.ok();
+  send('status');poll=setInterval(()=>send('status'),5000)}
+ catch(e){setLink('🔴 '+(e.name==='NotFoundError'?'No device chosen':e.message));log(e.message)}}
+$('#bt').onclick=()=>connect(false);$('#all').onclick=()=>connect(true);
+// ---- Demo device (same text the sketch prints, through the same parser)
+const D={soil:62,ml:400,pump:'OFF',mode:'OFF / STANDBY'};
+function demoTick(){D.soil=Math.max(0,Math.min(100,D.soil+(D.pump==='ON'?9:-1.2)+(Math.random()-.5)));D.ml=Math.max(0,D.ml-(D.pump==='ON'?20:0));
+ text(`🌱 Soil: ${D.soil.toFixed(1)}% relative index (ADC ${Math.round((100-D.soil)*40.95)})\n🪣 Water: ~${Math.round(D.ml)} mL / 500 mL (ADC 2000)\n🎛️ Pump mode: ${D.mode}\n🚿 Pump state: ${D.pump}\n🛡️ Water guard: ${D.ml>60?'PASS':'LOW'}\n`)}
+function demoCmd(c){if(c==='pump test'){D.pump='ON';D.mode='TIMED TEST';text('🧪🚿 SUPERVISED 30-SECOND PUMP TEST STARTED!\n');clearTimeout(tm);tm=setTimeout(()=>{D.pump='OFF';D.mode='OFF / STANDBY';text('🛑🚿 PUMP OFF — test ended.\n')},8000)}
+ else if(c==='pump off'){D.pump='OFF';D.mode='OFF / STANDBY';text('🛑🚿 PUMP OFF — user stop.\n')}else if(c==='pump auto'){D.mode='AUTO';text('🤖🌱 AUTO mode enabled!\n')}
+ else if(c==='status')demoTick();else text('Demo device: try status, pump test, pump auto, pump off.\n')}
+function stopDemo(){clearInterval(poll);S.demo=false}
+$('#demo').onclick=()=>{stopDemo();S.demo=true;setLink('🧪 DEMO device');log('Demo started.');sfx.pop();demoTick();poll=setInterval(demoTick,2000)};
+// ---- Camera (fetch + MJPEG parse; plain <img> is blocked from HTTPS pages)
+const ix=(b,a)=>{for(let i=0;i<b.length-1;i++)if(b[i]===a[0]&&b[i+1]===a[1])return i;return-1};
+$('#camgo').onclick=async()=>{const ip=$('#ip').value.trim();if(!ip)return;$('#camlink').href=`http://${ip}:81/stream`;
+ try{const r=await fetch(`http://${ip}:81/stream`),rd=r.body.getReader();let b=new Uint8Array(0),old;
+  for(;;){const{value,done}=await rd.read();if(done)break;const n=new Uint8Array(b.length+value.length);n.set(b);n.set(value,b.length);b=n;
+   let s=ix(b,[255,216]),e=ix(b,[255,217]);while(s>=0&&e>s){const u=URL.createObjectURL(new Blob([b.slice(s,e+2)],{type:'image/jpeg'}));$('#cam').src=u;if(old)URL.revokeObjectURL(old);old=u;b=b.slice(e+2);s=ix(b,[255,216]);e=ix(b,[255,217])}}}
+ catch(e){alert('Camera blocked or unreachable: '+e.message+'\nTry the stream link, or open this app from http://localhost.')}};
+let ev;addEventListener('beforeinstallprompt',e=>{e.preventDefault();ev=e;$('#inst').hidden=false});
+$('#inst').onclick=()=>{ev&&ev.prompt();ev=null;$('#inst').hidden=true};addEventListener('appinstalled',()=>{$('#inst').hidden=true});
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+// ---- SFX (WebAudio, no files) + mascot/chips/bars
+let AC,mute=localStorage.getItem('mute')==='1';$('#mute').textContent=mute?'🔇':'🔊';
+function tone(f,d=.12,t='sine',v=.14,at=0,f2){if(mute)return;try{AC=AC||new(window.AudioContext||webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain(),n=AC.currentTime+at;o.type=t;o.frequency.setValueAtTime(f,n);if(f2)o.frequency.exponentialRampToValueAtTime(f2,n+d);g.gain.setValueAtTime(v,n);g.gain.exponentialRampToValueAtTime(.001,n+d);o.connect(g);g.connect(AC.destination);o.start(n);o.stop(n+d)}catch(e){}}
+const sfx={tap:()=>tone(660,.06,'triangle',.08),ok:()=>[523,659,784,1047].forEach((f,i)=>tone(f,.14,'triangle',.13,i*.08)),pop:()=>tone(900,.1,'sine',.14,0,1400),pump:()=>{tone(300,.25,'sine',.18,0,700);tone(500,.2,'sine',.14,.1,900)},off:()=>tone(500,.25,'sine',.14,0,200),bad:()=>{tone(220,.18,'sawtooth',.1);tone(170,.25,'sawtooth',.1,.2)}};
+document.addEventListener('click',e=>{if(e.target.closest('button'))sfx.tap()});
+$('#mute').onclick=()=>{mute=!mute;localStorage.setItem('mute',mute?'1':'0');$('#mute').textContent=mute?'🔇':'🔊';sfx.pop()};
+$('#start').onclick=()=>{sfx.ok();$('#intro').classList.add('out')};
+const HT=[];let lastAt=0,P={pump:'--',guard:'--'};
+function fx(){const s=S.soil;
+ if(S.at!==lastAt&&s!=null){lastAt=S.at;HT.push([s,new Date(S.at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})]);if(HT.length>6)HT.shift()}
+ $('#chips').innerHTML=HT.map((x,i)=>`<span class="chp${i==HT.length-1?' on':''}">🌱<b>${x[0].toFixed(0)}</b><small>${x[1]}</small></span>`).join('');
+ const tp=Math.min(100,(S.ml||0)/5);$('#b1').style.height=(s||0)+'%';$('#b2').style.height=tp+'%';$('#tank').textContent=S.ml==null?'--':tp.toFixed(0)+'%';
+ const m=s==null?['M-10 30H10','Hi! Connect me 🌱']:s<=0?['M-12 36Q0 22 12 36',"I'm thirsty! 🥺💧"]:s>=50?['M-12 26Q0 42 12 26','Feeling great! 😊']:['M-10 30H10','Doing okay 🙂'];
+ $('#mouth').setAttribute('d',m[0]);$('#say').textContent=m[1];document.body.classList.toggle('pumping',S.pump==='ON');
+ if(P.pump!=='--'&&P.pump!==S.pump)S.pump==='ON'?sfx.pump():sfx.off();
+ if(S.guard!==P.guard&&S.guard!=='PASS'&&S.guard!=='--'){sfx.bad();navigator.vibrate&&navigator.vibrate([120,60,120])}
+ P.pump=S.pump;P.guard=S.guard}
+</script></body></html>
